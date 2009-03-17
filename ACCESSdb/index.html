@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+   <head>
+      <title>ACCESSdb: JavaScript Interface Library for MS Access</title>
+      <style>
+         body {
+            font-family:verdana;
+            padding:50px 150px;
+         }
+         h1 {
+            font-weight:500;
+            text-align:center;
+         }
+         table.myTable td, table.myTable th {
+            border-right:1px solid #000;
+            border-bottom:1px solid #000;
+            padding:3px;
+         }
+         table.myTable tr:first-child td, table.myTable tr:first-child th {
+            border-top:1px solid #000;
+         }
+         table.myTable tr td:first-child, table.myTable tr th:first-child {
+            border-left:1px solid #000;
+         }
+         #res {
+            border:1px solid darkgray;
+            padding:12px;
+            min-height:150px;
+            max-height:300px;
+            overflow:auto;
+         }
+      </style>
+   </head>
+   <body>
+      
+      <h1><img src="images/adb.png" /><br />JavaScript Interface Library for Microsoft Access</h1>
+      <br />
+      <p style="width:200px;padding:20px 30px; background:lightyellow; float:right">
+         Current Version: <b>0.9.0</b>
+         <br /><br />
+         Released: 02/19/2009
+         <br /><br />
+         <a href="https://sourceforge.net/project/platformdownload.php?group_id=256504">Download</a>
+         <br />
+      </p>
+      <p>
+         <b>ACCESSdb</b> is a JavaScript library used to dynamically connect to and query <i>locally available</i> Microsoft Access
+         database files within Internet Explorer.  All you need is an .mdb file; Access does not even need to be installed!  All of the SQL
+         queries available in Access can be executed on the fly, including SELECTs, INSERTs, UPDATEs, and JOINs.  Results are output in
+         several customizable formats including JSON, XML, and HTML.
+      </p>
+
+
+
+      
+      <h2>Connecting to a Database</h2>
+      <p>
+         To create a new database connection, use the ACCESSdb contructor to create a new instance of the
+         <b>ACCESSdb</b> object, passing a string
+         containing the path to the Access .mdb file. (Make sure to double up on the backslashes!):
+      </p>
+      <pre>
+         var myDB = new ACCESSdb("C:\\dbfile.mdb");
+      </pre>
+      <p>To see warning popups for database errors, add the optional <b>showErrors</b> parameter:</p>
+      <pre>
+         var myDB = new ACCESSdb("C:\\dbfile.mdb", {showErrors:true});
+      </pre>
+      
+      <h2>Running a Query</h2>
+      <p>To query a database, use ACCESSdb's <b>query</b> method:</p>
+      <pre>
+         var SQL = "SELECT * FROM myTable";
+         var resultSet = myDB.query(SQL);
+      </pre>
+      <pre>
+         var SQL = "INSERT INTO myTable VALUES(123, 'abc 123', 'xyz')";
+         if(myDB.query(SQL)) {
+            alert("Inserted!");
+         }
+      </pre>
+      <p>If a query fails, the method returns false:</p>
+      <pre>
+         var SQL = "UPDATE myTable SET col1 = 456, col2 = 'def 456', col3 = 'zyx' WHERE col1 = 123";
+         if(!myDB.query(SQL)) {
+            alert("Oh no!");
+         }
+      </pre>
+      <p>
+         By default, the record set of results is loaded into a JavaScript Array object.  To specify a different output
+         format, add the optional parameter for the desired format.  The available choices are
+         "xml", "json", or "table".
+      </p>
+      <pre>
+         var rsXML  = myDB.query(SQL, {xml:true});
+      </pre>
+      <pre>
+         var rsJSON = myDB.query(SQL, {json:true});
+      </pre>
+      <pre>
+         var rsHTML = myDB.query(SQL, {table:true});
+      </pre>
+
+      <h2>Customizing Output</h2>
+      <p>
+         Tables can be given IDs and can be assigned CSS classes using the optional <b>id</b> and <b>className</b> parameters:
+      </p>
+      <pre>
+         var rsHTML_Str  = myDB.query(SQL, {
+             table: {
+                 id        : "myTable",
+                 className : "myResultSet"
+             }
+         });
+      </pre>
+      <h3>Table Headers</h3>
+      <p>
+        You can also choose not to display the column headers with  the optional <b>noHeaders</b> parameter:
+      </p>
+      <pre>
+         var rsHTML_Str  = myDB.query(SQL, {
+             table: {
+                 noHeaders    : true
+             }
+         });
+      </pre>
+      <h3>Customizing Dates</h3>
+      <p>
+         When returning XML or an HTML table, you can customize the formatting of Date columns using the optional <b>formatDates</b>
+         parameter.  This parameter is an associative array wherein each key is the name of a table column to format
+         and the value is a format string describing how dates in that column should be displayed.
+      </p>
+      <p>
+         The format string uses the following abbreviations:
+      </p>
+<p style="text-align:center">
+<PRE style="margin:0 auto;width:600px">
+Field        | Full Form          | Short Form
+=============|====================|=================================
+Year         | yyyy (4 digits)    | yy (2 digits), y (2 or 4 digits)
+Month        | MMM (name or abbr.)| MM (2 digits), M (1 or 2 digits)
+             | NNN (abbr.)        |
+Day of Month | dd (2 digits)      | d (1 or 2 digits)
+Day of Week  | EE (name)          | E (abbr)
+Hour (1-12)  | hh (2 digits)      | h (1 or 2 digits)
+Hour (0-23)  | HH (2 digits)      | H (1 or 2 digits)
+Hour (0-11)  | KK (2 digits)      | K (1 or 2 digits)
+Hour (1-24)  | kk (2 digits)      | k (1 or 2 digits)
+Minute       | mm (2 digits)      | m (1 or 2 digits)
+Second       | ss (2 digits)      | s (1 or 2 digits)
+AM/PM        | a                  |
+-------------|--------------------|---------------------------------
+Unix Time    | @ (Unix Timestamp) |
+
+Examples:
+ "MMM d, y"               outputs: January 01, 2000
+                                   Dec 1, 1900
+                                   Nov 20, 00
+ "M/d/yy"                 outputs: 01/20/00
+                                   9/2/00
+ "MMM dd, yyyy hh:mm:ssa" outputs: "January 01, 2000 12:30:45AM"
+ "@"                      outputs: "915177604200"
+</PRE>
+</p>
+      <p>Usage:</p>
+      <pre>
+         var rsHTML_Str  = myDB.query(SQL, {
+             table: {
+                 formatDates    : {
+                    dateColumn1 : "M/d/yy",
+                    dateColumn2 : "MMM dd, yyyy hh:mm:ssa"
+                 }
+             }
+         });
+      </pre>
+      <p>To apply a particular format to <i>all</i> Date columns within an XML or HTML result set, pass the format string directly into the <b>formatDates</b> parameter:</p>
+      <pre>
+         var rsXML_Str  = myDB.query(SQL, {
+             xml: {
+                 formatDates    : "yyyy-MM-dd HH:mm:ss"
+             }
+         });
+      </pre>
+      <h3>String Output</h3>
+      <p>
+         When selected, XML is output as an XML Document Object by default.  XML can also be output as a string by
+         using the optional <b>stringOut</b> parameter:
+      </p>
+      <pre>
+         var rsXML = myDB.query(SQL, {xml:{stringOut:true}});
+      </pre>
+      <p>
+         When selected, the HTML table is output as an HTML table element object by default.
+         Tables can also be output directly into a string by using the optional <b>stringOut</b> parameter:
+      </p>
+      <pre>
+         var rsHTML_Str  = myDB.query(SQL, {table:{stringOut:true}});
+      </pre>
+
+      <h2>Batch Insertion</h2>
+      <p>
+         To insert multiple rows into a table in one call, use ACCESSdb's <b>insert</b> method.  This method can receive
+         the data to be inserted in the form of a JSON object, a JSON String, an XML Document Object, or an XML String.  (All in the
+         same format as is output by ACCESSdb.)
+      </p>
+      <pre>
+         myDB.insert("myTable", [
+            {
+               col1:25,
+               col2:"something",
+               col3:"something else"
+            },
+            {
+               col1:345.55,
+               col2:"something",
+               col3:"something else"
+            },
+
+            {
+               col1:234.1,
+               col2:"something",
+               col3:"something else"
+            }
+         ]);
+      </pre>
+      <pre>
+         myDB.insert("myTable", "&#60;?xml version=\"1.0\" encoding=\"utf-8\"?&#62;&#60;recordset&#62;&#60;record&#62;&#60;col1&#62;354.01&#60;/col1&#62;&#60;col2&#62;Some value&#60;/col2&#62;&#60;/record&#62;&#60;record&#62;&#60;col1&#62;45&#60;/col1&#62;&#60;col2&#62;Some \"value\"&#60;/col2&#62;&#60;/record&#62;&#60;/recordset&#62;");
+      </pre>
+
+      <h2>Error Handling</h2>
+      <p>
+         To add your own error handling function to a query or a batch insert, use the optional <b>errorHandler</b>
+         parameter.  A pointer to the Error object is passed to this function.  If an insert fails, the method stops processing
+         input records and returns false.
+         
+      </p>
+      <pre>
+         var rsHTML = myDB.query(SQL, {
+            table:true,
+             errorHandler: function(e) {
+                $("#errorBox").html("<b>" + e.name + ":<b>  " + e.description);
+             }
+         });
+      </pre>
+      <pre>
+         myDB.insert(
+            "myTable",
+            [
+               {
+                  col1:25,
+                  col2:"something else"
+               },
+               {
+                  col1:345.55,
+                  col2:"something"
+               }
+            ],
+            {
+             errorHandler: function(e) {
+                alert("Error inserting to myTable!\n\n" + e.description);
+             }
+            }
+         );
+      </pre>
+      
+      <p style="text-align:center;font-size:9pt;font-weight:100">
+         Febuary 19, 2009
+         <a href="http://www.kopimi.com/kopimi/" title="kopimi"><img style="margin-bottom:-2px" src="http://www.kopimi.se/kopimi/c_mini_5.gif" border="0" alt="kopimi" /></a>
+         Joshua Faulkenberry
+      </p>
+   </body>
+</html>
