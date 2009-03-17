@@ -30,25 +30,137 @@
             overflow:auto;
          }
       </style>
+      <script type="text/javascript" src="jquery.js"></script>
+      <script type="text/javascript" src="accessdb.js"></script>
+      <script>
+         $(document).ready(function(){
+
+            $("#run").click(function(){
+               //Configure the output options
+               var options = {};
+               if($('#type').val() == "xml") {
+                  options["xml"] = {
+                     stringOut   : true,
+                     formatDates : "U"
+                  };
+               }
+               else if($('#type').val() == "xmlD") {
+                  options["xml"] = true;
+               }
+               else if($('#type').val() == "table" || $('#type').val() == "tableS") {
+                  var sOut = false;
+                  if($('#type').val() == "tableS") {
+                     sOut = true;
+                  }
+                  var nohdrs = true;
+                  if($('#hdrs').val() == "false") {
+                     nohdrs = false;
+                  }
+                  options["table"] = {
+                     stringOut   : sOut,
+                     noHeaders   : nohdrs,
+                     className   : $('#clss').val(),
+                     id          : $('#id').val(),
+                     formatDates : {
+                        ExpDate  : $('#dates').val()
+                     }
+                  };
+               }
+               else if($('#type').val() != "jsonO") {
+                  options[$('#type').val()] = true;
+               }
+
+               //Execute the query
+               var tval = myDB.query($('#query').val(), options);
+
+               //Format "XML String" and "HTML Table String" output for display
+               if($('#type').val() == "xml" || $('#type').val() == "tableS") {
+                  tval = tval.replace(/\>/g, '&#62;');
+                  tval = tval.replace(/\<\//g, '&#60;/');
+                  tval = tval.replace(/\</g, '<br />&#60;');
+               }
+
+               if(typeof(tval) == "object" && !tval.innerHTML) {
+                  if($('#type').val() == "jsonO") {
+                     alert("JSON Object returned with " + tval.length + " rows.");
+                  }
+                  else if($('#type').val() == "xmlD") {
+                     alert("XML Document Object returned with " + tval.getElementsByTagName("record").length + " rows.");
+                  }
+               }
+               else {
+                  //Display the Results
+                  $("#res").html(tval);
+               }
+            });
+
+            $("#type").change(function(){
+              if(this.value.indexOf("table") < 0) {
+                 $("#tableConf").hide();
+              }
+              else {
+                 $("#tableConf").show();
+              }
+            });
+
+         });
+         var currentPath = ((location+"").replace(/%20/g, " ").replace("file:///", "").replace("/", "\\").replace("index.html", ""));
+         var myDB = new ACCESSdb(currentPath+"AdmnCodes.mdb", {showErrors:true});
+      </script>
    </head>
    <body>
-      
-      <h1><img src="images/adb.png" /><br />JavaScript Interface Library for Microsoft Access</h1>
+      <h1><strong>ACCESSdb</strong>: JavaScript Interface Library for Microsoft Access</h1>
       <br />
-      <p style="width:200px;padding:20px 30px; background:lightyellow; float:right">
-         Current Version: <b>0.9.0</b>
-         <br /><br />
-         Released: 02/19/2009
-         <br /><br />
-         <a href="https://sourceforge.net/project/platformdownload.php?group_id=256504">Download</a>
-         <br />
-      </p>
       <p>
          <b>ACCESSdb</b> is a JavaScript library used to dynamically connect to and query <i>locally available</i> Microsoft Access
          database files within Internet Explorer.  All you need is an .mdb file; Access does not even need to be installed!  All of the SQL
          queries available in Access can be executed on the fly, including SELECTs, INSERTs, UPDATEs, and JOINs.  Results are output in
          several customizable formats including JSON, XML, and HTML.
       </p>
+      <p style="color:darkred">
+         I still need to document exactly which IE settings will allow ACCESSdb to work unfettered...
+      </p>
+      <p style="text-align:center; background:lightyellow">
+         Current Version: <b>0.9.1</b>
+      </p>
+
+      <h2>Example</h2>
+      <p><i>Note: jQuery was used to create this example, however ACCESSdb itself does not require jQuery.</i></p>
+      <div style="float:left;margin-right:15px">
+         <textarea id="query" style="width:365px;height:100px">
+SELECT SubscrDetails.CustNo, SubscrDetails.ItemCode, SubscrDetails.Quantity, AdminCodes.StockNumber, AdminCodes.ShortItemName, AdminCodes.Supplements, SubscrDetails.ExpDate, [Quantity]*[Supplements] AS Total, SubscrDetails.GroupNo
+FROM Customers
+INNER JOIN (AdminCodes INNER JOIN SubscrDetails ON AdminCodes.ItemCode = SubscrDetails.ItemCode)
+ON Customers.CustNo = SubscrDetails.CustNo
+ORDER BY SubscrDetails.CustNo
+         </textarea>
+         <br />
+         Output Format:
+         <select id="type">
+            <option value="table">HTML Table Obj</table>
+            <option value="tableS">HTML Table String</table>
+            <option value="jsonO">JSON Obj</table>
+            <option value="json">JSON String</table>
+            <option value="xmlD">XML Doc Obj</table>
+            <option value="xml">XML String</table>
+         <select>
+         <input type="button" id="run" value="Run Query" />
+         <div id="tableConf">
+            Id:
+            <input id="id" size="17" />
+            Class:
+            <input id="clss" value="myTable" />
+            <br />
+            Show Headers:
+            <select id="hdrs">
+               <option value="false">Yes</table>
+               <option value="true">No</table>
+            <select>
+            Dates:
+            <input id="dates" size="16" value="hh:mma MMM dd, yyyy" />
+         </div>
+      </div>
+      <div id="res"></div>
 
 
 
