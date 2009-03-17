@@ -1,9 +1,11 @@
 /*
- * ACCESSdb JavaScript Library v0.9.1
+ * ACCESSdb JavaScript Library v0.9.2
  *
  * Joshua Faulkenberry
+ * Dual licensed under the MIT and GPL licenses.
  *
- * Date: 2009-03-13
+ * Date: 2009-03-14
+ * Revision: 4
  */
 (function() {
 
@@ -97,8 +99,9 @@
       this.options.adOpenDynamic = this.options.adOpenDynamic || 2;
       this.options.adLockOptimistic = this.options.adLockOptimistic || 3;
       this.options.persist = this.options.persist || false;
-      this.options.password = this.options.password || "";
-      
+     this.options.user = this.options.user || "";
+     this.options.password = this.options.password || "";
+     this.options.wrkgrpFile = "Jet OLEDB:System Database="+this.options.wrkgrpFile+";" || "";
       this.dataSource = dataSrc;
       this.provider = "Microsoft.Jet.OLEDB.4.0";
       this.conn = new ActiveXObject("ADODB.Connection");
@@ -122,7 +125,7 @@
             result = false;
          }
          if (rs.Fields.Count) {
-            if (!rs.bof) {
+            if (!rs.bof && !rs.eof) {
                if (options.json) {
                   result = this.outJSON(rs);
                }
@@ -137,10 +140,13 @@
                }
             }
             else {
-               result = eval("(" + this.outJSON(rs) + ")");
+               result = false;
             }
             rs.close();
          }
+       else {
+         result = false;
+       }
          return result;
       };
       
@@ -369,7 +375,7 @@
       };
       
       try {
-         this.conn.open("Provider = " + this.provider + ";Data Source = " + this.dataSource + ";Persist Security Info = " + this.options.persist, "", this.options.password);
+         this.conn.open("Provider = " + this.provider + ";Data Source = " + this.dataSource + ";"+this.options.wrkgrpFile+"Persist Security Info = " + this.options.persist, this.options.user, this.options.password);
       } 
       catch (e) {
          if (this.options.showErrors) {
