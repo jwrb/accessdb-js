@@ -12,25 +12,25 @@
    //Helper function to handle Date formatting
    window.Date.prototype.format = function(format) {
       if (format == "@") { return this.getTime(); }
-      var MONTH_NAMES = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-      var DAY_NAMES = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat');
-      var LZ = function(x) { return (x < 0 || x > 9 ? "" : "0") + x} 
-      var date = this;
       format = format + "";
-      var result = "";
-      var i_format = 0;
-      var c = "";
-      var token = "";
-      var y = date.getYear() + "";
-      var M = date.getMonth() + 1;
-      var d = date.getDate();
-      var E = date.getDay();
-      var H = date.getHours();
-      var m = date.getMinutes();
-      var s = date.getSeconds();
-      var yyyy, yy, MMM, MM, dd, hh, h, mm, ss, ampm, HH, H, KK, K, kk, k;
-      // Convert real date parts into formatted versions
-      var value = new Object();
+      var MONTH_NAMES = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'),
+          DAY_NAMES = new Array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'),
+          LZ = function(x) { return (x < 0 || x > 9 ? "" : "0") + x}, 
+          date = this,
+          result = "",
+          i_format = 0,
+          c = "",
+          token = "",
+          y = date.getYear() + "",
+          M = date.getMonth() + 1,
+          d = date.getDate(),
+          E = date.getDay(),
+          H = date.getHours(),
+          m = date.getMinutes(),
+          s = date.getSeconds(),
+          value = new Object(),
+          yyyy, yy, MMM, MM, dd, hh, h, mm, ss, ampm, HH, H, KK, K, kk, k;
+          
       if (y.length < 4) {
          y = "" + (y - 0 + 1900);
       }
