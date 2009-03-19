@@ -1,11 +1,12 @@
 /*
  * ACCESSdb JavaScript Library v0.9.2
+ * http://ACCESSdb.sourceforge.net/
  *
- * Joshua Faulkenberry
+ * Copyright (c) 2009 Joshua Faulkenberry
  * Dual licensed under the MIT and GPL licenses.
  *
- * Date: 2009-03-14
- * Revision: 4
+ * $Date$
+ * $Revision$
  */
 (function() {
 
