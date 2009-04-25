@@ -1,5 +1,5 @@
 /*
- * ACCESSdb JavaScript Library v0.9.2
+ * ACCESSdb JavaScript Library v0.9.3
  * http://ACCESSdb.sourceforge.net/
  *
  * Copyright (c) 2009 Joshua Faulkenberry
